@@ -1,0 +1,272 @@
+//Author: Katherine Daves
+//Purpose: Converts formatting of information from file to CSV format, cleaning employee information to standard format
+
+#include <iostream> // required for cin/count functions
+#include <iomanip> // required for formatting functions
+#include <fstream> // required for reading files
+#include <cctype> // required for toupper function
+#include <string> // required for string manipulation
+
+using namespace std;
+string fixName(string n);
+//takes in the name and returns it in the right format
+string fixSSN(string ss); //Fixes SSN
+string fixPhone(string ph); // Fixes phone number
+string fixAddress(string addr); //Fixes address
+string fixCity(string cty); // Fixes city
+string fixState(string st); // Fixes state
+string extractField(string& s);
+//Extracts a field eg name from the input string and then deletes
+//it and the octothorpe (#) that follows it. Notice string s is
+//passed by reference
+void buildLine(string& s, string field);
+// Concatenates field and a comma to string s
+
+int main()
+{
+    // Creates filestream object, identifies filepath and opens file
+    ifstream infile;
+    infile.open("C:\\Users\\kated\\Documents\\SUMMER 24\\cmpscexperiments\\Lab_11\\badnames\\badnames.txt");
+    // Read validation, displays error message if unable to read file
+    if (infile.fail())
+    cout << "Unable to open file!" << endl;
+    else
+    {
+    string s, n, ss, ph, addr, cty, st, zip;
+    // establishes variables needed for reading and determining fields
+    // creates loop for reading each line of the file as a string
+    while (getline(infile, s))
+    {
+        n = extractField(s);
+        // obtains name, deletes it from the main string function
+        n = fixName(n);
+        // reformats name to show in requested format
+        ss = extractField(s);
+        // obtains SSN, deletes it from the main string function
+        ss = fixSSN(ss);
+        // reformats SSN to show in requested format
+        ph = extractField(s);
+        // obtains phone, deletes it from the main string function
+        ph = fixPhone(ph);
+        // reformats phone to show in requested format
+        addr = extractField(s);
+        // obtains address (first line), deletes it from the main string function
+        addr = fixAddress(addr);
+        // reformats address to show in requested format
+        cty = extractField(s);
+        // obtains city, deletes it from the main string function
+        cty = fixCity(cty);
+        // reformats city to show in requested format
+        st = extractField(s);
+        // obtains state, deletes it from the main string function
+        st = fixState(st);
+        // reformats state to show in requested format
+        zip = s;
+        // assigns remaining values of string (zip code) to zip code field
+        s = n;
+        // resets string to start with reformatted name
+        buildLine(s, ss);
+        // sends SSN to function to add comma for CSV, attach back to main string
+        buildLine(s, ph);
+        // sends SSN to function to add comma for CSV, attach back to main string
+        buildLine(s, addr);
+        // sends address to function to add comma for CSV, attach back to main string
+        buildLine(s, cty);
+        // sends city to function to add comma for CSV, attach back to main string
+        buildLine(s, st);
+        // sends state to function to add comma for CSV, attach back to main string
+        buildLine(s, zip);
+        // sends zip to function to add comma for CSV, attach back to main string
+        cout << s;
+        // shows line as reformatted into CSV format
+        cout << endl;
+    }       
+    }
+    return 0;
+}
+
+// FUNCTION DEFINITIONS
+
+string fixName(string n)
+{
+string first, last;
+int p, l;
+// initiates variables for first name, last name
+// position in string, length of string
+l = n.length();
+p = n.find(" ");
+first = n.substr(0, (p));
+// sets first name to pull from beginning to first space
+last = n.substr((p + 1), (l+1));
+// sets last name to pull starting at character following space
+first[0] = toupper(first[0]);
+last[0] = toupper(last[0]);
+// converts first character of each name to uppercase
+n = last + "," + first;
+// reformats first name last name to LastName, FirstName format
+return n;
+// returns n to function reformatted
+}
+
+//takes in the name and returns it in the right format
+string fixSSN(string ss)
+{
+string ss1, ss2, ss3;
+// establishes string variables for each section of the SSN
+ss1 = ss.substr(0, 3);
+// pulls first 3 digits of SSN
+ss2 = ss.substr(3, 2);
+// pulls next 2 digits of SSN
+ss3 = ss.substr(5, 4);
+// separates last 4 digits of SSN
+ss = ss1 + "-" + ss2 + "-" + ss3;
+// reformats all parts of SSN with dashes
+return ss;
+// returns ss to function reformatted
+}
+//Fixes SSN
+
+string fixPhone(string ph)
+{
+string ph1, ph2, ph3;
+// establishes string variables for each section of phone number
+ph1 = ph.substr(0, 3);
+// pulls first 3 digits of phone number
+ph2= ph.substr(3, 3);
+// pulls next 3 digits of phone number
+ph3 = ph.substr(6, 4);
+// pulls last 4 digits of phone number
+ph = ph1 + "-" + ph2 + "-" + ph3;
+// reformats all parts of phone number with dashes
+return ph;
+// returns ph to function reformatted
+}
+// Fixes phone number
+
+string fixAddress(string addr)
+{
+int p, length;
+// establishes variables for length
+string address;
+// establishes second string variable to pass information
+addr = addr + " ";
+// adds space to the end of the address
+// to be used by loop to read last part of the address
+length = addr.length();
+// sets length variable
+while (length > 0)
+{
+    p = addr.find(" ");
+    // searches for position of the next space
+    string part = addr.substr(0, p);
+    // separates the part preceding the space
+    part[0] = toupper(part[0]);
+    // converts first letter of this separated word to uppercase
+    address = address + part + " ";
+    // adds reforrmatted word to new string variable
+    addr = addr.substr((p + 1), (length));
+    // removes reformatted word from original string variable
+    length = addr.length();
+    // recalculates length of the string
+}// repeats with each word until only space remains in function
+address = address.substr(0, (address.length() - 1));
+// removes added space from address
+return address;
+}
+//Fixes address
+
+string fixCity(string cty)
+{
+int p, length;
+// establishes variables for length
+string city;
+// establishes second string variable to pass information
+cty = cty + " ";
+// adds space to the end of the city
+// to be used by loop to read last part of the city
+length = cty.length();
+// sets length variable
+while (length > 0)
+{
+p = cty.find(" ");
+// searches for position of the next space
+string part = cty.substr(0, p);
+// separates the part preceding the space
+part[0] = toupper(part[0]);
+// converts first letter of this separated word to uppercase
+city = city + part + " ";
+// adds reforrmatted word to new string variable
+cty = cty.substr((p + 1), (length));
+// removes reformatted word from original string variable
+length = cty.length();
+// recalculates length of the string
+} // repeats with each word until only space remains in function
+city = city.substr(0, (city.length() - 1));
+// removes added space from city
+return city;
+// returns city to function reformatted
+}
+// Fixes city
+
+string fixState(string st)
+{
+st[0] = toupper(st[0]);
+st[1] = toupper(st[1]);
+// converts both letters of state code provided to uppercase
+return st;
+// returns cty to function reformatted
+}
+// Fixes state
+
+string extractField(string& s)
+{
+string field;
+// establishes field variable to return field to function
+int p = s.find('#');
+// returns position of next # in the string
+int l = s.length();
+// returns length of the string in full
+field= s.substr(0, p);
+// separates part of string preceding first # into return field
+s = s.substr((p+1), (l));
+// removes return field from string variable through reference variable
+return field;
+// passes back separated field from first part of string
+}
+//Extracts a field eg name from the input string and then deletes
+//it and the octothorpe (#) that follows it. Notice string s is
+//passed by reference
+
+void buildLine(string& s, string field)
+{
+field = "," + field;
+// takes in field value and adds a comma before value
+s = s + field;
+// adds field to main string by reference variable
+}
+// Concatenates field and a comma to string s
+
+/*
+EXECUTION SAMPLE:
+Smith,John,165-98-0076,814-833-7965,3rd & State St,Erie,PA,16506
+Gardner,Martin,164-90-5543,440-354-2700,5244 Heisley
+Rd,Mentor,OH,44123
+Vendetti,Sarah,164-87-9987,330-254-1122,29 Millhaven
+St.,Akron,OH,44532
+Golumbiewski,Judy,194-40-9976,716-334-7654,6187 Fillmore
+Ave,Rochester,NY,07654
+Merz,Terry,193-97-6554,800-243-5799,19876 Elm
+Avenue,Manchester,MO,63166
+Jones,Kenisha,198-43-2265,919-361-0419,902 East Taylor
+Rd,Apex,NC,27709
+Yee,Phil,176-40-9976,630-860-2682,1976 Wacker
+Drive,Chicago,IL,60191
+Caron,Jean,167-45-3321,973-887-4700,1429 Delben
+Street,Whippany,NJ,07981
+Alicea,Sandy,176-41-9006,305-442-8202,12 La Habana
+East,Miami,FL,33134
+Williams,Rob,206-33-7765,334-271-5450,9854 Fremont
+Blvd,Montgomery,AL,36109
+Hilfiger,Jancy,201-87-6987,814-881-7654,3012 State
+St,Pittsburgh,PA,15011
+*/
